@@ -4,6 +4,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+//prueba1 retorna con etiquetas (<p>,<div>,etc), usado en DocumentExtractor
 public class CustomContentHandler extends DefaultHandler {
     private StringBuilder extractedText = new StringBuilder();
     private int indentation = 0;
