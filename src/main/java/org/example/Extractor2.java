@@ -1,5 +1,9 @@
 package org.example;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -8,13 +12,10 @@ import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 public class Extractor2 {
     public static void main(String[] args) {
-        String filePath = "src/resources/archivos/documento.pdf";
+        //String filePath = "src/resources/archivos/documento.pdf";
+        String filePath = "src/resources/archivos/2023 - Core Java Cheatsheet.pdf";
 
         try (FileInputStream input = new FileInputStream(new File(filePath))) {
             StructuredContentHandler structuredHandler = new StructuredContentHandler();
