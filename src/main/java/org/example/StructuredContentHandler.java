@@ -5,12 +5,25 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import java.util.Stack;
 
+/*
+FIXME #6
+
+Una vez abordados todos todos estos aspectos.
+
+El siguiente objetivo es explorar diseños para escalar el procesamiento
+
+1. Documentos con más de 100, 1000 páginas.
+2. 10, 100, 1000, Documentos al mismo tiempo
+
+*/
+
 //prueba2 retorna el texto sin etiquetas, usado en Extractor2
 public class StructuredContentHandler extends DefaultHandler {
     private final StringBuilder extractedText = new StringBuilder();
     private final Stack<String> elementStack = new Stack<>();
     private final StringBuilder currentText = new StringBuilder();
     private int hierarchyLevel = 0;
+    private Document currentDocument;
 
     // Elementos que indican niveles jerárquicos en documentos
     private static final String[] TITLE_ELEMENTS = {
@@ -20,6 +33,12 @@ public class StructuredContentHandler extends DefaultHandler {
     private static final String[] PARAGRAPH_ELEMENTS = {
             "p", "div", "td", "li"
     };
+
+    @Override
+    public void startDocument() throws SAXException {
+        System.out.println("Inicio del documento");
+//        this.currentDocument = new Document(ROOT);
+    }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
