@@ -1,82 +1,69 @@
 package org.example;
 
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
+import org.apache.tika.parser.pdf.PDFParser;
+import org.apache.tika.parser.pdf.PDFParserConfig;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
-import org.apache.tika.parser.pdf.PDFParser;
-import org.apache.tika.parser.pdf.PDFParserConfig;
-import org.xml.sax.SAXException;
 
 public class DocumentExtractor {
-    public static void main(String[] args) {
-        String filePath = "src/resources/archivos/Tax_Guide.pdf";
 
-        try (FileInputStream input = new FileInputStream(new File(filePath))) {
-            CustomContentHandler customHandler = new CustomContentHandler();
+    /**
+     * Extrae la estructura de un documento
+     * @param filePath Ruta al archivo
+     * @return Documento estructurado
+     * @throws IOException Si hay un error al leer el archivo
+     * @throws TikaException Si hay un error al procesar el documento
+     * @throws SAXException Si hay un error en el parsing XML
+     */
+    public Document extract(String filePath) throws IOException, TikaException, SAXException {
+        File file = new File(filePath);
+
+        if (!file.exists()) {
+            throw new IOException("El archivo no existe: " + filePath);
+        }
+
+        try (FileInputStream input = new FileInputStream(file)) {
+            StructuredContentHandler structuredHandler = new StructuredContentHandler();
+            // usamos BodyContentHandler para filtrar elementos no deseados
+            BodyContentHandler bodyHandler = new BodyContentHandler(structuredHandler);
+
             Metadata metadata = new Metadata();
+            metadata.set("resourceName", file.getName());
+
+            // Configurar el parser según la extensión del archivo
+            Parser parser;
             ParseContext context = new ParseContext();
 
-/*
-FIXME #2
-Estas configuraciones son para el parser de PDF, pero no para el parser de OOXML.
+            String fileName = file.getName().toLowerCase();
+            if (fileName.endsWith(".pdf")) {
+                parser = new PDFParser();
 
-Revisando
-https://tika.apache.org/3.1.0/api/org/apache/tika/parser/pdf/PDFParserConfig.html
-
-Se puede configurar el PDFParser directamente, sin hace falta:
-
-Calls to PDFParser, i.e. parser.getPDFParserConfig().setEnableAutoSpace()
-
-Son pocos los casos en los que requerimos ajustar el ParseContext
-Ver:
-
-5.5 Context-sensitive parsing (Libro)
-
-Quitar este bloque de código, creo que es buena idea extraer documentos de tipo 'imágen'.
- */
-            /* PDFParserConfig pdfConfig = new PDFParserConfig();
-            pdfConfig.setSortByPosition(true); // ordenamos el texto por posición
-            pdfConfig.setExtractInlineImages(true); // extraer imágenes
-            context.set(PDFParserConfig.class, pdfConfig);
- */
-            PDFParserConfig pdfConfig = new PDFParserConfig();
-            pdfConfig.setSortByPosition(true); // ordenamos el texto por posición
-            pdfConfig.setExtractInlineImages(false); // No extraer imágenes
-            context.set(PDFParserConfig.class, pdfConfig);
-
-
-/*
-FIXME #1
-Esta forma de detectar el tipo de archivo no es la mejor porque la extensión de un archivo se puede cambiar fácilmente.
-Revisar https://tika.apache.org/3.1.0/detection.html#Content_Detection
-Mover este bloque a una función estática que acepte un objeto de tipo java.nio.file.Path y retorne el parser apropiado o un error.
-*/
-
-/*
-FIXME #3
-Usar el BodyContentHandler(customHandler) para extraer el contenido del cuerpo del documento. Podemos omitir el encabezado/header.
- */
-            // determinar el tipo de archivo
-            if (filePath.endsWith(".pdf")) {
-                PDFParser pdfParser = new PDFParser();
-                pdfParser.parse(input, customHandler, metadata, context);
-            } else if (filePath.endsWith(".docx")) {
-                OOXMLParser ooxmlParser = new OOXMLParser();
-                ooxmlParser.parse(input, customHandler, metadata, context);
+                // Configuración específica para PDFs
+                PDFParserConfig pdfConfig = new PDFParserConfig();
+                pdfConfig.setSortByPosition(true);
+                pdfConfig.setExtractInlineImages(false);
+                context.set(PDFParserConfig.class, pdfConfig);
+            } else if (fileName.endsWith(".docx") || fileName.endsWith(".doc")) {
+                parser = new OOXMLParser();
             } else {
-                throw new IllegalArgumentException("Formato de archivo no soportado");
+                throw new IllegalArgumentException("El formato de archivo no es soportado: " + fileName);
             }
 
-            String structuredText = customHandler.getExtractedText();
-            System.out.println("Texto estructurado extraído:\n" + structuredText);
-
-        } catch (IOException | TikaException | SAXException e) {
-            e.printStackTrace();
+            parser.parse(input, bodyHandler, metadata, context);
+            return structuredHandler.getDocument();
         }
     }
 }
