@@ -19,7 +19,7 @@ public class StructuredContentHandler extends DefaultHandler {
     private final Stack<String> elementStack = new Stack<>();
     private Document rootDocument;
     private Document currentDocument;
-    private final Stack<Document> documentStack = new Stack<>();
+    private final Stack<Document> documentStack = new Stack<>(); //FIXME
 
     @Override
     public void startDocument() throws SAXException {
@@ -30,6 +30,7 @@ public class StructuredContentHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
+        System.err.println("startElement: " + qName);
         elementStack.push(qName.toLowerCase());
         // Limpiar texto acumulado entre elementos
         currentText.setLength(0);
@@ -37,6 +38,7 @@ public class StructuredContentHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) {
+        System.err.println("endElement: " + qName);
         String element = qName.toLowerCase();
 
         // Uso de Set para búsqueda más eficiente (O(1) vs O(n))
@@ -53,6 +55,7 @@ public class StructuredContentHandler extends DefaultHandler {
     @Override
     public void characters(char[] ch, int start, int length) {
         String content = new String(ch, start, length);
+        System.err.println("characters: " + content);
         // Solo agregar espacios cuando sea necesario
         if (!content.isEmpty()) {
             if (currentText.length() > 0 && !Character.isWhitespace(currentText.charAt(currentText.length() - 1))

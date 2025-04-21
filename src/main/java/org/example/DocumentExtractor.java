@@ -43,20 +43,22 @@ public class DocumentExtractor {
             // usamos BodyContentHandler para filtrar elementos no deseados
             BodyContentHandler bodyHandler = new BodyContentHandler(structuredHandler);
 
+
             Metadata metadata = new Metadata();
-            metadata.set("resourceName", file.getName());
+            metadata.set("resourceName", file.getName()); //FIXME #1 No es necesario pasar la propiedad 'resourceName' al metadata, quitar esta línea
 
             ParseContext context = new ParseContext();
             
             // Determinar el parser adecuado basado en el tipo de archivo
             Parser parser = determinarParser(inputStream, metadata, context);
             
-            parser.parse(inputStream, bodyHandler, metadata, context);
+            parser.parse(inputStream, bodyHandler, metadata, context); //
             return structuredHandler.getDocument();
         }
     }
     
     //  Determina el parser adecuado según el tipo MIME del archivo
+    //FIXME #2 este método depende únicamente de sus parámetros de entrada. Convertir a método estático
     private Parser determinarParser(InputStream inputStream, Metadata metadata, ParseContext context) throws IOException {
         // Asegurarse de que el inputStream soporte mark/reset
         if (inputStream.markSupported()) {
@@ -87,6 +89,7 @@ public class DocumentExtractor {
      * @param parser Parser de PDF a configurar
      * @param context Contexto de parsing
      */
+    // FIXME #3 este método depende únicamente de sus parámetros de entrada. Convertir a método estático
     private void configurarPDF(PDFParser parser, ParseContext context) {
         PDFParserConfig pdfConfig = new PDFParserConfig();
         pdfConfig.setSortByPosition(true);

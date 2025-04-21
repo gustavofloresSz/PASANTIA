@@ -13,6 +13,23 @@ título/capítulo que a su vez es parte de todo el documento.
 A nivel de texto sólo interesa llegar a nivel del párrafo; componentes de un párrafo como oraciones,
 frases o palabras no importa
  */
+
+/*FIXME #4
+
+Para el documento: Doc1.docx, la estructura debería ser:
+
+ROOT
+|_(h1, Bienvenido hola mundo)
+	|_(h2, Inicio de la prueba)
+		|_(a, ) <-- Como está vacío, no se debería agregar
+		|_(p, Esta prueba se usara para extraer los párrafos)
+		|_(p, ) <-- Como está vacío, no se debería agregar
+|_(h2, Bienvenido hola mundo parte 2)
+
+Ajusta Esta clase para que tenga los siguiente atributos
+
+Document (type, text, children, parent y level)
+ */
 public class Document {
     private String title;
     private String subtitle;

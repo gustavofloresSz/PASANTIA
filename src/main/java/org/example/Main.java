@@ -2,7 +2,7 @@ package org.example;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "src/resources/archivos/Doc3.docx";
+        String filePath = "src/resources/archivos/Doc1.docx";
 
         try {
             DocumentExtractor extractor = new DocumentExtractor();
