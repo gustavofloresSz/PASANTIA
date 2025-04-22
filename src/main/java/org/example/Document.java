@@ -28,7 +28,7 @@ ROOT
 
 Ajusta Esta clase para que tenga los siguiente atributos
 
-Document (type, text, children, parent y level)
+Document (String type, StringBuilder text, List<Document> children, Document parent y Integer level)
  */
 public class Document {
     private String title;
