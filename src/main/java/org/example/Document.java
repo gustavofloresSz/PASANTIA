@@ -19,12 +19,12 @@ frases o palabras no importa
 Para el documento: Doc1.docx, la estructura debería ser:
 
 ROOT
-|_(h1, Bienvenido hola mundo)
+|_(h1, Título #1)
 	|_(h2, Inicio de la prueba)
 		|_(a, ) <-- Como está vacío, no se debería agregar
-		|_(p, Esta prueba se usara para extraer los párrafos)
+		|_(p, Esta prueba se usará para extraer los párrafos)
 		|_(p, ) <-- Como está vacío, no se debería agregar
-|_(h2, Bienvenido hola mundo parte 2)
+|_(h2, Título #2)
 
 Ajusta Esta clase para que tenga los siguiente atributos
 
