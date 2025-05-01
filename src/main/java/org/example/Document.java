@@ -3,17 +3,6 @@ package org.example;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-El proceso de extracción debe preservar la estructura del documento.
-Me explico, si el documento tiene títulos/capítulos, subtítulos, etc. la extracción
-debe retornar un documento que contiene otros documentos.
-
-Por ejemplo, un subtítulo que contiene párrafos, tablas o gráficos que a su vez es parte de un
-título/capítulo que a su vez es parte de todo el documento.
-A nivel de texto sólo interesa llegar a nivel del párrafo; componentes de un párrafo como oraciones,
-frases o palabras no importa
- */
-
 /*FIXME #4
 
 Para el documento: Doc1.docx, la estructura debería ser:
@@ -31,18 +20,18 @@ Ajusta Esta clase para que tenga los siguiente atributos
 Document (String type, StringBuilder text, List<Document> children, Document parent y Integer level)
  */
 public class Document {
-    private String title;
-    private String subtitle;
-    private String content;
+    private String type;
+    private StringBuilder text;
     private List<Document> children;
-    private int level;
+    private Document parent;
+    private Integer level;
 
-    public Document(String title, int level) {
-        this.title = title;
+    public Document(String type, Integer level) {
+        this.type = type;
         this.level = level;
-        this.subtitle = "";
-        this.content = "";
+        this.text = new StringBuilder();
         this.children = new ArrayList<>();
+        this.parent = null;
     }
 
     public Document() {
@@ -51,37 +40,31 @@ public class Document {
 
     public void addChild(Document child) {
         this.children.add(child);
+        child.parent = this;
     }
 
-    public String getTitle() {
-        return title;
+    public String getType() {
+        return type;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getSubtitle() {
-        return subtitle;
+    public StringBuilder getText() {
+        return text;
     }
 
-    public void setSubtitle(String subtitle) {
-        this.subtitle = subtitle;
+    public void setText(StringBuilder text) {
+        this.text = text;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void appendContent(String text) {
-        if (this.content.isEmpty()) {
-            this.content = text;
-        } else {
-            this.content += "\n" + text;
+    public void appendText(String additionalText) {
+        if (additionalText != null && !additionalText.trim().isEmpty()) {
+            if (this.text.length() > 0) {
+                this.text.append("\n");
+            }
+            this.text.append(additionalText.trim());
         }
     }
 
@@ -89,22 +72,32 @@ public class Document {
         return children;
     }
 
-    public int getLevel() {
+    public Document getParent() {
+        return parent;
+    }
+
+    public void setParent(Document parent) {
+        this.parent = parent;
+    }
+
+    public Integer getLevel() {
         return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (level == 0 || level == 1) {
-            sb.append("  ".repeat(level)).append("Title: ").append(title).append("\n");
-        } else {
-            sb.append("  ".repeat(level)).append("Subtitle: ").append(title).append("\n");
-        }
+        String indent = "  ".repeat(level);
 
-        if (!content.isEmpty()) {
-            sb.append("  ".repeat(level)).append("Content: ").append(content).append("\n");
+        sb.append(indent).append("(").append(type).append(", ");
+        if (text.length() > 0) {
+            sb.append(text);
         }
+        sb.append(")\n");
 
         for (Document child : children) {
             sb.append(child.toString());
